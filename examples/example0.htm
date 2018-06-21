@@ -1,0 +1,151 @@
+<html> 
+   <head>
+     <meta charset="utf-8" />
+     <title>DynaMo Example</title> 
+     <script type='text/javascript' src='https://www.x3dom.org/download/x3dom.js'> </script> 
+     <script type='text/javascript' src='../src/dynamo.js'></script>
+     <link rel='stylesheet' type='text/css' href='https://www.x3dom.org/download/x3dom.css'></link>
+<style>
+body {
+  font-family: Verdana, sans-serif;
+}
+.tutorial {
+  padding: 5px;
+}
+.code {
+  padding: 10px;
+  background: #F2F2F2;
+  font-family: monospace;
+}
+.column {
+  float: left;
+  width: 800px;
+}
+</style>
+
+<script>
+var spec = {
+  "description" : "dynaspec example",
+  "groups" : {
+    "BC" : { 
+      "match" : "PART_B|PART_C"
+    }
+  },
+  "states" : {
+    "A" : {   
+      "description" : "state A",
+      "state" : [
+        {
+          "id" : "PART_A", 
+          "field" : "translation", 
+          "value" : [0,0,0]
+        },
+        {
+          "group" : "BC",
+          "field" : "rotation",
+          "value" : [1,0,0,-1.5707963]
+        }
+      ]
+    },
+    "B" : {   
+      "description" : "state B",
+      "state" : [
+        {
+          "id" : "PART_A", 
+          "field" : "translation", 
+          "value" : [0,1.0,0]
+        },
+        {
+          "group" : "BC",
+          "field" : "rotation",
+          "value" : [1,0,0,1.5707963/2.0]
+        }
+      ]
+    }
+  },
+  "animations" : {
+    "anim1" : {
+      "title" : "test animation",
+      "sequence" : [
+        { "from" : "A", "to" : "B", "dur": 1.0 },
+        { "from" : "B", "to" : "A", "dur": 2.0 }
+      ]
+    }
+  }
+};
+</script>
+     
+   </head>
+   <body>
+   <div style="left: 800px; width:500px; height:500px; position:fixed;">
+<x3d id='x3dscene' width='500' height='500'> 
+  <scene>
+    <transform id='PART_A'>
+      <shape> 
+        <appearance><material diffuseColor='1 0 0'></material></appearance> 
+        <sphere></sphere>
+      </shape> 
+    </transform>
+    <transform id='PART_B' translation='-3 0 0'>
+      <shape> 
+        <appearance><material diffuseColor='0 1 0'></material></appearance> 
+        <cone></cone>
+      </shape> 
+    </transform>
+    <transform id='PART_C' translation='3 0 0'>
+      <shape> 
+        <appearance><material diffuseColor='0 0 1'></material></appearance> 
+        <box></box>
+      </shape> 
+    </transform>
+  </scene>
+</x3d>
+</div> <br>
+<div class="column">
+<div class="tutorial">
+This example demonstrates the <b>dynamo.js</b> API.<br>
+The simple example scene and dynamo spec is already defined in this file.
+The snippets can be pasted in the developer console (F12 in Firefox and Chrome), 
+or run by pressing the according "runme" buttons, and console output can be inspected.</div>
+<br>
+<div class="tutorial">First, we create an instance of the DynaMo object
+and bind it to the x3dom canvas. The instance
+parses the <i>spec</i> definition and precalculates
+state value aggregations. </div>
+<div class="code">
+<button onclick="dynamo = new DynaMoInstance('x3dscene', spec);">runme</button>
+var dynamo = new DynaMoInstance("x3dscene", spec);</div>
+<br>
+<div class="tutorial">
+Note that an instance must exist for the following snippets to work.<br><br>
+Then, we apply the modifications from a state.
+This command combines any initial node values and 
+the state definitions contained in the given named state:
+<div class="code">
+<button onclick="dynamo.setState('A');">runme</button>
+dynamo.setState("A");</div>
+<div class="code">
+<button onclick="dynamo.setState('B');">runme</button>
+dynamo.setState("B");</div>
+
+<br>
+<div class="tutorial">Next, example of direct interactive dynamic scene modification
+by letting the system perform a transition from state <b>A</b> to
+state <b>B</b> in one second:</div><br>
+<div class="code">
+<button onclick="dynamo.doStateTransition('A', 'B', 1.0);">runme</button>
+dynamo.doStateTransition("A", "B", 1.0);</div>
+<br>
+<div class="tutorial">run this snippet to enable or disable an animation that 
+bounces between states A and B. Note that conflicting state animations and state
+transitions will overwrite each other.</div><br>
+<div class="code">
+<button onclick="dynamo.enableAnimation('anim1');">runme</button>
+dynamo.enableAnimation('anim1');</div>
+<div class="code">
+<button onclick="dynamo.disableAnimation('anim1');">runme</button>
+dynamo.disableAnimation('anim1');</div>
+</div>
+</body>
+
+</html>
