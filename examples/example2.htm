@@ -1,0 +1,125 @@
+<html> 
+   <head>
+     <meta charset="utf-8" />
+     <title>Dynamo: Aggregating rotations</title> 
+     <script type='text/javascript' src='https://www.x3dom.org/download/x3dom.js'> </script> 
+     <script type='text/javascript' src='../src/dynamo.js'></script>
+     <link rel='stylesheet' type='text/css' href='https://www.x3dom.org/download/x3dom.css'></link>
+<style>
+body {
+  font-family: Verdana, sans-serif;
+}
+.tutorial {
+  padding: 5px;
+}
+.code {
+  padding: 10px;
+  background: #F2F2F2;
+  font-family: monospace;
+}
+.column {
+  float: left;
+  width: 800px;
+}
+</style>
+
+<script>
+var spec = {
+  "description" : "dynaspec example",
+  "groups" : {
+  },
+  "states" : {
+    "A" : {   
+      "description" : "state 1",
+      "state" : [
+      ]
+    },
+    "B" : {   
+      "description" : "state 2",
+      "state" : [
+      ]
+    }
+  },
+  "animations" : {
+  }
+};
+</script>
+
+
+<script>
+
+
+// initialize state A with zero
+function init() {
+  var s=document.getElementById('scene')
+  for(var i=0, ie=s.childElementCount; i<ie; i++)
+  {
+      var node=s.children[i];
+      spec.states['A'].state.push(
+      { "id": node.getAttribute("id"),
+        "field": "translation",
+        "value": [0,0,0]
+      })
+      spec.states['B'].state.push(
+      { "id": node.getAttribute("id"),
+        "field": "translation",
+        "value": [0,0,0]
+      })
+  }
+  spec.curState="A"
+}
+
+function start() {
+  
+  // dynamically build an animation
+  var l=2.0;
+  
+  var s=document.getElementById('scene')
+  for(var i=0, ie=s.childElementCount; i<ie; i++)
+  {
+    // create a random unit vector
+    var a=[Math.random()-0.5,Math.random()-0.5,Math.random()-0.5]
+    
+    var n=l/Math.sqrt(a[0]*a[0]+a[1]*a[1]+a[2]*a[2])
+    var movement=[a[0]*n,a[1]*n,a[2]+n]
+
+    var node=s.children[i];
+    
+    spec.states[spec.curState].state[i] = { 
+         "id": node.getAttribute("id"),
+        "field": "translation",
+        "value": movement
+    }
+  }
+  
+  spec.dynamo = new DynaMoInstance("x3delement", spec);
+  var from = spec.curState;
+  var to = spec.curState == "A" ? "B" : "A"
+  spec.dynamo.doStateTransition(to, from, 1.0);
+  spec.curState = to;
+}
+
+</script>
+
+
+</head>
+
+<body onload="init()">
+
+<x3d style="height:80%;width:100%;border: none;" id='x3delement'> 
+<background DEF='WO_World' groundColor='0.01 0.01 0.01' skyColor='0.01 0.01 0.01' backUrl='"env/env-back.jpg"' bottomUrl='"env/env-down.jpg"' frontUrl='"env/env-forward.jpg"' leftUrl='"env/env-left.jpg"' rightUrl='"env/env-right.jpg"' topUrl='"env/env-up.jpg"'></background>
+<scene id="scene">
+    <transform id='A'><shape><appearance><material diffuseColor='1 0 0'></material></appearance><box></box></shape></transform> 
+    <transform id='B'><shape><appearance><material diffuseColor='0 1 0'></material></appearance><box></box></shape></transform>
+    <transform id='C'><shape><appearance><material diffuseColor='0 0 1'></material></appearance><box></box></shape></transform>
+    <transform id='D'><shape><appearance><material diffuseColor='1 1 0'></material></appearance><box></box></shape></transform>
+    <transform id='E'><shape><appearance><material diffuseColor='1 0 1'></material></appearance><box></box></shape></transform>
+    <transform id='F'><shape><appearance><material diffuseColor='0 1 1'></material></appearance><box></box></shape></transform>
+    <transform id='G'><shape><appearance><material diffuseColor='1 0.5 1'></material></appearance><box></box></shape></transform>
+    
+</scene>
+</x3d>
+
+<button onClick="start()">START</button>
+
+</body>
